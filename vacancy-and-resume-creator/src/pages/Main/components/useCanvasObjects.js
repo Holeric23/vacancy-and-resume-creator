@@ -125,6 +125,7 @@ const useCanvasObjects = () => {
     updateProperty,
     deleteSelected,
     selectObject,
+    setObjects,
   };
 };
 

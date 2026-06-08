@@ -1,119 +1,144 @@
-const TypeInfo = ({ type }) => (
-  <div style={{ marginBottom: '16px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Тип</label>
-    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{type}</div>
-  </div>
-);
+import CollapsibleSection from '../../../components/CollapsibleSection';
 
-const ContentField = ({ value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Содержимое</label>
-    <input
-      type="text"
-      value={value}
-      onChange={onChange}
-      style={{ width: '100%', padding: '4px', fontSize: '12px', boxSizing: 'border-box' }}
-    />
-  </div>
-);
+const roundToOne = (num) => Math.round(num * 10) / 10;
 
-const PositionControls = ({ x, y, onXChange, onYChange }) => (
-  <>
+const clampNumber = (value, min = 0, max = Infinity) => {
+  let num = parseFloat(String(value).replace(',', '.'));
+  if (isNaN(num)) num = min;
+  return roundToOne(Math.min(Math.max(num, min), max));
+};
+
+const TypeAndContentSection = ({ type, content, onUpdateContent }) => (
+  <CollapsibleSection title="Основное" defaultCollapsed={false}>
     <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>X (px)</label>
-      <input type="number" step="0.01" value={x} onChange={onXChange} style={inputStyle} />
+      <label style={labelStyle}>Тип</label>
+      <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{type}</div>
     </div>
     <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Y (px)</label>
-      <input type="number" step="0.01" value={y} onChange={onYChange} style={inputStyle} />
+      <label style={labelStyle}>Содержимое</label>
+      <input type="text" value={content} onChange={onUpdateContent} style={inputStyle} />
     </div>
-  </>
+  </CollapsibleSection>
 );
 
-const SizeControls = ({ width, height, onWidthChange, onHeightChange }) => (
-  <>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Ширина (px)</label>
-      <input type="number" step="0.01" value={width} onChange={onWidthChange} style={inputStyle} />
-    </div>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Высота (px)</label>
-      <input type="number" step="0.01" value={height} onChange={onHeightChange} style={inputStyle} />
-    </div>
-  </>
-);
+const PositionAndSizeSection = ({ x, y, width, height, zIndex, onUpdatePosition, onUpdateSize, onUpdateZIndex }) => {
+  const handleX = (e) => onUpdatePosition('x', clampNumber(e.target.value));
+  const handleY = (e) => onUpdatePosition('y', clampNumber(e.target.value));
+  const handleWidth = (e) => onUpdateSize('width', clampNumber(e.target.value, 10));
+  const handleHeight = (e) => onUpdateSize('height', clampNumber(e.target.value, 10));
+  const handleZIndex = (e) => onUpdateZIndex(clampNumber(e.target.value));
 
-const LayerControl = ({ zIndex, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Z-индекс</label>
-    <input type="number" value={zIndex} onChange={onChange} style={inputStyle} />
-  </div>
-);
+  return (
+    <CollapsibleSection title="Позиция и размер" defaultCollapsed={false}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div>
+          <label style={labelStyle}>X (px)</label>
+          <input type="number" step="0.1" value={x} onChange={handleX} style={inputStyle} />
+        </div>
+        <div>
+          <label style={labelStyle}>Y (px)</label>
+          <input type="number" step="0.1" value={y} onChange={handleY} style={inputStyle} />
+        </div>
+        <div>
+          <label style={labelStyle}>Ширина (px)</label>
+          <input type="number" step="0.1" value={width} onChange={handleWidth} style={inputStyle} />
+        </div>
+        <div>
+          <label style={labelStyle}>Высота (px)</label>
+          <input type="number" step="0.1" value={height} onChange={handleHeight} style={inputStyle} />
+        </div>
+      </div>
+      <div style={{ marginTop: '8px' }}>
+        <label style={labelStyle}>Z-индекс</label>
+        <input type="number" value={zIndex} onChange={handleZIndex} style={inputStyle} />
+      </div>
+    </CollapsibleSection>
+  );
+};
 
-const CornerRadiusControl = ({ value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Скругление углов (px)</label>
-    <input type="number" step="0.01" value={value} onChange={onChange} style={inputStyle} />
-  </div>
-);
+const AppearanceSection = ({ backgroundColor, borderColor, borderWidth, cornerRadius, onUpdate }) => {
+  const handleBg = (e) => onUpdate('backgroundColor', e.target.value);
+  const handleBorderColor = (e) => onUpdate('borderColor', e.target.value);
+  const handleBorderWidth = (e) => onUpdate('borderWidth', clampNumber(e.target.value, 0));
+  const handleCornerRadius = (e) => onUpdate('cornerRadius', clampNumber(e.target.value, 0, 50));
 
-const ColorControl = ({ label, value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>{label}</label>
-    <input type="color" value={value} onChange={onChange} style={{ width: '100%', padding: '2px', height: '32px' }} />
-  </div>
-);
+  return (
+    <CollapsibleSection title="Внешний вид" defaultCollapsed={false}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Цвет фона</label>
+        <input type="color" value={backgroundColor} onChange={handleBg} style={colorInputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Цвет границы</label>
+        <input type="color" value={borderColor} onChange={handleBorderColor} style={colorInputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Толщина границы (px)</label>
+        <input type="number" step="0.1" value={borderWidth} onChange={handleBorderWidth} style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Скругление углов (px)</label>
+        <input type="number" step="0.1" value={cornerRadius} onChange={handleCornerRadius} style={inputStyle} />
+      </div>
+    </CollapsibleSection>
+  );
+};
 
-const BorderWidthControl = ({ value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Толщина границы (px)</label>
-    <input type="number" step="0.01" value={value} onChange={onChange} style={inputStyle} />
-  </div>
-);
+const TextSection = ({ textColor, fontFamily, fontSize, onUpdate }) => {
+  const handleColor = (e) => onUpdate('textColor', e.target.value);
+  const handleFontFamily = (e) => onUpdate('fontFamily', e.target.value);
+  const handleFontSize = (e) => onUpdate('fontSize', clampNumber(e.target.value, 6, 200));
 
-const FontFamilySelect = ({ value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Шрифт</label>
-    <select value={value} onChange={onChange} style={{ width: '100%', padding: '4px', fontSize: '12px' }}>
-      <option value="system-ui, sans-serif">Системный</option>
-      <option value="Arial, sans-serif">Arial</option>
-      <option value="Times New Roman, serif">Times New Roman</option>
-      <option value="Courier New, monospace">Courier New</option>
-    </select>
-  </div>
-);
+  return (
+    <CollapsibleSection title="Текст" defaultCollapsed={false}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Цвет текста</label>
+        <input type="color" value={textColor} onChange={handleColor} style={colorInputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Шрифт</label>
+        <select value={fontFamily} onChange={handleFontFamily} style={inputStyle}>
+          <option value="system-ui, sans-serif">Системный</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Times New Roman, serif">Times New Roman</option>
+          <option value="Courier New, monospace">Courier New</option>
+        </select>
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Размер шрифта (px)</label>
+        <input type="number" value={fontSize} onChange={handleFontSize} style={inputStyle} />
+      </div>
+    </CollapsibleSection>
+  );
+};
 
-const FontSizeControl = ({ value, onChange }) => (
-  <div style={{ marginBottom: '12px' }}>
-    <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Размер шрифта (px)</label>
-    <input type="number" value={value} onChange={onChange} style={inputStyle} />
-  </div>
-);
+const ShadowSection = ({ offsetX, offsetY, blur, color, onUpdate }) => {
+  const handleOffsetX = (e) => onUpdate('shadowOffsetX', clampNumber(e.target.value));
+  const handleOffsetY = (e) => onUpdate('shadowOffsetY', clampNumber(e.target.value));
+  const handleBlur = (e) => onUpdate('shadowBlur', clampNumber(e.target.value, 0));
+  const handleColor = (e) => onUpdate('shadowColor', e.target.value);
 
-const ShadowControls = ({ offsetX, offsetY, blur, color, onXChange, onYChange, onBlurChange, onColorChange }) => (
-  <>
-    <hr style={{ margin: '16px 0' }} />
-    <h4 style={{ fontSize: '14px', margin: '0 0 8px 0' }}>Тень</h4>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Смещение X (px)</label>
-      <input type="number" value={offsetX} onChange={onXChange} style={inputStyle} />
-    </div>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Смещение Y (px)</label>
-      <input type="number" value={offsetY} onChange={onYChange} style={inputStyle} />
-    </div>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Размытие (px)</label>
-      <input type="number" value={blur} onChange={onBlurChange} style={inputStyle} />
-    </div>
-    <div style={{ marginBottom: '12px' }}>
-      <label style={{ display: 'block', fontSize: '13px', marginBottom: '4px' }}>Цвет тени</label>
-      <input type="color" value={color} onChange={onColorChange} style={{ width: '100%', padding: '2px', height: '32px' }} />
-    </div>
-  </>
-);
-
-const inputStyle = { width: '100%', padding: '4px', fontSize: '12px', boxSizing: 'border-box' };
+  return (
+    <CollapsibleSection title="Тень" defaultCollapsed={true}>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Смещение X (px)</label>
+        <input type="number" value={offsetX} onChange={handleOffsetX} style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Смещение Y (px)</label>
+        <input type="number" value={offsetY} onChange={handleOffsetY} style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Размытие (px)</label>
+        <input type="number" value={blur} onChange={handleBlur} style={inputStyle} />
+      </div>
+      <div style={{ marginBottom: '12px' }}>
+        <label style={labelStyle}>Цвет тени</label>
+        <input type="color" value={color} onChange={handleColor} style={colorInputStyle} />
+      </div>
+    </CollapsibleSection>
+  );
+};
 
 function RightPanel({ selectedObject, onUpdateProperty, onUpdateSize }) {
   if (!selectedObject) {
@@ -125,81 +150,57 @@ function RightPanel({ selectedObject, onUpdateProperty, onUpdateSize }) {
     );
   }
 
-  const handleChange = (prop, value) => onUpdateProperty(selectedObject.id, prop, value);
-
-  const roundToTwo = (num) => Math.round(num * 100) / 100;
-
-  const handleNumber = (prop, value) => {
-    let strValue = String(value).replace(',', '.');
-    let num = parseFloat(strValue);
-    if (isNaN(num)) num = 0;
-    if (num < 0) num = 0;
-    handleChange(prop, roundToTwo(num));
+  const handleUpdateProperty = (prop, value) => onUpdateProperty(selectedObject.id, prop, value);
+  const handleUpdateSize = (dim, value) => {
+    if (dim === 'width') onUpdateSize(selectedObject.id, value, selectedObject.height);
+    else onUpdateSize(selectedObject.id, selectedObject.width, value);
   };
-
-  const handlePos = (prop, value) => handleNumber(prop, value);
-
-  const handleSize = (dim, value) => {
-    let strValue = String(value).replace(',', '.');
-    let num = parseFloat(strValue);
-    if (isNaN(num)) num = 10;
-    if (dim === 'width') onUpdateSize(selectedObject.id, num, selectedObject.height);
-    else onUpdateSize(selectedObject.id, selectedObject.width, num);
+  const handleUpdatePosition = (coord, value) => {
+    if (coord === 'x') onUpdateProperty(selectedObject.id, 'x', value);
+    else onUpdateProperty(selectedObject.id, 'y', value);
   };
-
-  const handleCornerRadius = (prop, value) => {
-    let strValue = String(value).replace(',', '.');
-    let num = parseFloat(strValue);
-    if (isNaN(num)) num = 0;
-    if (num < 0) num = 0;
-    if (num > 50) num = 50;
-    handleChange(prop, roundToTwo(num));
-  }
 
   return (
     <div style={panelStyle}>
-      <h3 style={{ fontSize: '16px', margin: '0 0 12px 0' }}>Свойства</h3>
-
-      <TypeInfo type={selectedObject.type} />
-      <ContentField value={selectedObject.content} onChange={(e) => handleChange('content', e.target.value)} />
-
-      <PositionControls
+      <h3 style={{ fontSize: '16px', margin: '0 0 16px 0' }}>Свойства</h3>
+      <TypeAndContentSection
+        type={selectedObject.type}
+        content={selectedObject.content}
+        onUpdateContent={(e) => handleUpdateProperty('content', e.target.value)}
+      />
+      <PositionAndSizeSection
         x={selectedObject.x}
         y={selectedObject.y}
-        onXChange={(e) => handlePos('x', e.target.value)}
-        onYChange={(e) => handlePos('y', e.target.value)}
-      />
-
-      <SizeControls
         width={selectedObject.width}
         height={selectedObject.height}
-        onWidthChange={(e) => handleSize('width', e.target.value)}
-        onHeightChange={(e) => handleSize('height', e.target.value)}
+        zIndex={selectedObject.zIndex}
+        onUpdatePosition={handleUpdatePosition}
+        onUpdateSize={handleUpdateSize}
+        onUpdateZIndex={(val) => handleUpdateProperty('zIndex', val)}
       />
-
-      <LayerControl zIndex={selectedObject.zIndex} onChange={(e) => handleNumber('zIndex', e.target.value)} />
-
-      <ColorControl label="Цвет фона" value={selectedObject.backgroundColor} onChange={(e) => handleChange('backgroundColor', e.target.value)} />
-
-      <ColorControl label="Цвет границы" value={selectedObject.borderColor} onChange={(e) => handleChange('borderColor', e.target.value)} />
-      <BorderWidthControl value={selectedObject.borderWidth} onChange={(e) => handleNumber('borderWidth', e.target.value)} />
-
-      <ColorControl label="Цвет текста" value={selectedObject.textColor} onChange={(e) => handleChange('textColor', e.target.value)} />
-      <FontFamilySelect value={selectedObject.fontFamily} onChange={(e) => handleChange('fontFamily', e.target.value)} />
-      <FontSizeControl value={selectedObject.fontSize} onChange={(e) => handleNumber('fontSize', e.target.value)} />
-
-      <CornerRadiusControl value={selectedObject.cornerRadius} onChange={(e) => handleCornerRadius('cornerRadius', e.target.value)} />
-
-      <ShadowControls
+      <AppearanceSection
+        backgroundColor={selectedObject.backgroundColor}
+        borderColor={selectedObject.borderColor}
+        borderWidth={selectedObject.borderWidth}
+        cornerRadius={selectedObject.cornerRadius}
+        onUpdate={handleUpdateProperty}
+      />
+      <TextSection
+        textColor={selectedObject.textColor}
+        fontFamily={selectedObject.fontFamily}
+        fontSize={selectedObject.fontSize}
+        onUpdate={handleUpdateProperty}
+      />
+      <ShadowSection
         offsetX={selectedObject.shadowOffsetX}
         offsetY={selectedObject.shadowOffsetY}
         blur={selectedObject.shadowBlur}
         color={selectedObject.shadowColor}
-        onXChange={(e) => handleNumber('shadowOffsetX', e.target.value)}
-        onYChange={(e) => handleNumber('shadowOffsetY', e.target.value)}
-        onBlurChange={(e) => handleNumber('shadowBlur', e.target.value)}
-        onColorChange={(e) => handleChange('shadowColor', e.target.value)}
+        onUpdate={handleUpdateProperty}
       />
+      <div style={{ fontSize: '12px', color: '#aaa', textAlign: 'center', marginTop: '20px' }}>
+        {/* Здесь будет синхронизация с сервером */}
+      </div>
     </div>
   );
 }
@@ -212,6 +213,30 @@ const panelStyle = {
   padding: '16px',
   overflowY: 'auto',
   fontFamily: 'var(--sans)',
+};
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '12px',
+  marginBottom: '4px',
+  color: '#555',
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '6px',
+  fontSize: '12px',
+  boxSizing: 'border-box',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+};
+
+const colorInputStyle = {
+  width: '100%',
+  padding: '2px',
+  height: '34px',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
 };
 
 export default RightPanel;

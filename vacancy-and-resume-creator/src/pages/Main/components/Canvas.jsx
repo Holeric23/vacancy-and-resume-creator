@@ -1,14 +1,25 @@
-import { useRef, useState, useEffect } from 'react';
+import { forwardRef, useRef, useState, useEffect } from 'react';
 
 const PAGE_WIDTH = 800;
 const PAGE_HEIGHT = 1130;
 
-function Canvas({ objects, selectedId, onSelect, onUpdatePosition }) {
+const Canvas = forwardRef(({ objects, selectedId, onSelect, onUpdatePosition }, externalRef) => {
   const scrollContainerRef = useRef(null);
   const pageRef = useRef(null);
   const [draggingId, setDraggingId] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const lastMousePosRef = useRef({ x: 0, y: 0 });
+
+  // Передаём наружу реф на элемент страницы
+  useEffect(() => {
+    if (externalRef) {
+      if (typeof externalRef === 'function') {
+        externalRef(pageRef.current);
+      } else {
+        externalRef.current = pageRef.current;
+      }
+    }
+  }, [externalRef]);
 
   const getCursorInContainer = (clientX, clientY) => {
     const container = scrollContainerRef.current;
@@ -36,8 +47,8 @@ function Canvas({ objects, selectedId, onSelect, onUpdatePosition }) {
       const maxY = PAGE_HEIGHT - obj.height;
       const clampedX = Math.min(Math.max(newX, 0), maxX);
       const clampedY = Math.min(Math.max(newY, 0), maxY);
-      const roundedX = Math.round(clampedX * 100) / 100;
-      const roundedY = Math.round(clampedY * 100) / 100;
+      const roundedX = Math.round(clampedX * 10) / 10;
+      const roundedY = Math.round(clampedY * 10) / 10;
       onUpdatePosition(draggingId, roundedX, roundedY);
     };
 
@@ -133,7 +144,7 @@ function Canvas({ objects, selectedId, onSelect, onUpdatePosition }) {
       </div>
     </div>
   );
-}
+});
 
 const canvasContainerStyle = {
   gridArea: 'center',
