@@ -2,7 +2,6 @@ import CollapsibleSection from '../../../components/CollapsibleSection';
 
 function LeftPanel({ objects, selectedId, onSelect, addObject }) {
   const handleAddDefaultBlock = () => {
-    // Добавляем в центр холста
     addObject('rectangle', 100, 100);
   };
 

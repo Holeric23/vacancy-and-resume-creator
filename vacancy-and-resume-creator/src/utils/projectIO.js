@@ -26,6 +26,7 @@ export const importProject = (file) => {
         const data = JSON.parse(e.target.result);
         if (data.objects && Array.isArray(data.objects)) {
           resolve(data.objects);
+          
         } else {
           reject(new Error('Некорректный формат: отсутствует поле objects'));
         }

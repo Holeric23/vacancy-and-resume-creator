@@ -1,7 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
-
-let nextId = 1;
-const generateId = () => `obj_${nextId++}`;
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 const PAGE_WIDTH = 800;
 const PAGE_HEIGHT = 1130;
@@ -11,6 +8,28 @@ const roundToTwo = (num) => Math.round(num * 100) / 100;
 const useCanvasObjects = () => {
   const [objects, setObjects] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  
+  // useRef для хранения следующего ID (не вызывает перерендер)
+  const nextIdRef = useRef(1);
+
+  // Функция обновления nextId на основе максимального ID в импортированных объектах
+  const updateNextIdFromObjects = useCallback((objs) => {
+    let maxId = 0;
+    objs.forEach(obj => {
+      const match = obj.id.match(/obj_(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxId) maxId = num;
+      }
+    });
+    nextIdRef.current = maxId + 1;
+  }, []);
+
+  const generateId = useCallback(() => {
+    const newId = `obj_${nextIdRef.current}`;
+    nextIdRef.current += 1;
+    return newId;
+  }, []);
 
   const validatePosition = (obj, x, y) => {
     const maxX = PAGE_WIDTH - obj.width;
@@ -58,7 +77,7 @@ const useCanvasObjects = () => {
     defaultProps.y = clamped.y;
     setObjects(prev => [...prev, defaultProps]);
     setSelectedId(defaultProps.id);
-  }, []);
+  }, [generateId]);
 
   const updatePosition = useCallback((id, x, y) => {
     setObjects(prev => prev.map(obj => {
@@ -126,6 +145,7 @@ const useCanvasObjects = () => {
     deleteSelected,
     selectObject,
     setObjects,
+    updateNextIdFromObjects,
   };
 };
 

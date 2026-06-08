@@ -24,7 +24,7 @@ const getGlobalCSS = () => `
 `;
 
 function Main() {
-  const { objects, selectedId, addObject, updatePosition, updateSize, updateProperty, selectObject, setObjects } = useCanvasObjects();
+  const { objects, selectedId, addObject, updatePosition, updateSize, updateProperty, selectObject, setObjects, updateNextIdFromObjects } = useCanvasObjects();
   const pageRef = useRef(null);
 
   const handleExportProject = () => {
@@ -41,6 +41,7 @@ function Main() {
       try {
         const importedObjects = await importProject(file);
         setObjects(importedObjects);
+        updateNextIdFromObjects(importedObjects); // обновляем счётчик ID
         alert('Проект успешно загружен');
       } catch (err) {
         alert('Ошибка импорта: ' + err.message);

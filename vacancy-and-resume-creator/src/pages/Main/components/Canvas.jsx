@@ -10,7 +10,6 @@ const Canvas = forwardRef(({ objects, selectedId, onSelect, onUpdatePosition }, 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const lastMousePosRef = useRef({ x: 0, y: 0 });
 
-  // Передаём наружу реф на элемент страницы
   useEffect(() => {
     if (externalRef) {
       if (typeof externalRef === 'function') {
