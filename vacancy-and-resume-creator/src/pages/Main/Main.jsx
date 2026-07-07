@@ -1,12 +1,13 @@
-import { useRef } from 'react';
+import { useRef, useContext } from 'react';
 import LeftPanel from './components/LeftPanel';
 import RightPanel from './components/RightPanel';
 import Canvas from './components/Canvas';
-import Toolbar from './components/Toolbar';
+// import Toolbar from './components/Toolbar';
+import MenuBar from './components/MenuBar';
 import useCanvasObjects from './components/useCanvasObjects';
 import { exportProject, importProject } from '../../utils/projectIO';
-// import { exportAsMHTML, exportAsPDF } from '../../utils/exportView';
 import { exportAsPDF } from '../../utils/exportView';
+import { PanelStateContext } from '../../contexts';
 
 const getGlobalCSS = () => `
   :root {
@@ -24,11 +25,29 @@ const getGlobalCSS = () => `
 `;
 
 function Main() {
-  const { objects, selectedId, addObject, updatePosition, updateSize, updateProperty, selectObject, setObjects, updateNextIdFromObjects } = useCanvasObjects();
+  const {
+    objects,
+    selectedId,
+    addObject,
+    updatePosition,
+    updateSize,
+    updateProperty,
+    selectObject,
+    setObjects,
+    updateNextIdFromObjects
+  } = useCanvasObjects();
+
   const pageRef = useRef(null);
+  const panelState = useContext(PanelStateContext);
 
   const handleExportProject = () => {
-    exportProject(objects, 'my-project');
+    const projectData = {
+      version: '1.0',
+      createdAt: new Date().toISOString(),
+      objects,
+      panelState: panelState ? panelState.collapsedSections : {}
+    };
+    exportProject(projectData, 'my-project');
   };
 
   const handleImportProject = () => {
@@ -39,9 +58,12 @@ function Main() {
       const file = e.target.files[0];
       if (!file) return;
       try {
-        const importedObjects = await importProject(file);
-        setObjects(importedObjects);
-        updateNextIdFromObjects(importedObjects); // обновляем счётчик ID
+        const projectData = await importProject(file);
+        setObjects(projectData.objects);
+        updateNextIdFromObjects(projectData.objects);
+        if (panelState && projectData.panelState) {
+          panelState.restoreCollapsedSections(projectData.panelState);
+        }
         alert('Проект успешно загружен');
       } catch (err) {
         alert('Ошибка импорта: ' + err.message);
@@ -49,15 +71,6 @@ function Main() {
     };
     input.click();
   };
-
-  // Экспорт MHTML – временно отключён
-  // const handleExportMHTML = () => {
-  //   if (pageRef.current) {
-  //     exportAsMHTML(pageRef.current, getGlobalCSS(), 'page.mhtml');
-  //   } else {
-  //     alert('Страница не готова');
-  //   }
-  // };
 
   const handleExportPDF = () => {
     if (pageRef.current) {
@@ -69,11 +82,9 @@ function Main() {
 
   return (
     <div style={mainContainerStyle}>
-      <Toolbar
+      <MenuBar
         onImportProject={handleImportProject}
         onExportProject={handleExportProject}
-        // onExportMHTML={handleExportMHTML}
-        onExportMHTML={() => alert('Экспорт MHTML временно недоступен')}
         onExportPDF={handleExportPDF}
       />
       <LeftPanel

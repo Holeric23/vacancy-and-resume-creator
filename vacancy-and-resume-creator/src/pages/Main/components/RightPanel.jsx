@@ -9,7 +9,7 @@ const clampNumber = (value, min = 0, max = Infinity) => {
 };
 
 const TypeAndContentSection = ({ type, content, onUpdateContent }) => (
-  <CollapsibleSection title="Основное" defaultCollapsed={false}>
+  <CollapsibleSection title="Основное" sectionKey="right-main" defaultCollapsed={false}>
     <div style={{ marginBottom: '12px' }}>
       <label style={labelStyle}>Тип</label>
       <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{type}</div>
@@ -29,7 +29,7 @@ const PositionAndSizeSection = ({ x, y, width, height, zIndex, onUpdatePosition,
   const handleZIndex = (e) => onUpdateZIndex(clampNumber(e.target.value));
 
   return (
-    <CollapsibleSection title="Позиция и размер" defaultCollapsed={false}>
+    <CollapsibleSection title="Позиция и размер" sectionKey="right-position" defaultCollapsed={false}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <div>
           <label style={labelStyle}>X (px)</label>
@@ -63,7 +63,7 @@ const AppearanceSection = ({ backgroundColor, borderColor, borderWidth, cornerRa
   const handleCornerRadius = (e) => onUpdate('cornerRadius', clampNumber(e.target.value, 0, 50));
 
   return (
-    <CollapsibleSection title="Внешний вид" defaultCollapsed={false}>
+    <CollapsibleSection title="Внешний вид" sectionKey="right-appearance" defaultCollapsed={false}>
       <div style={{ marginBottom: '12px' }}>
         <label style={labelStyle}>Цвет фона</label>
         <input type="color" value={backgroundColor} onChange={handleBg} style={colorInputStyle} />
@@ -90,7 +90,7 @@ const TextSection = ({ textColor, fontFamily, fontSize, onUpdate }) => {
   const handleFontSize = (e) => onUpdate('fontSize', clampNumber(e.target.value, 6, 200));
 
   return (
-    <CollapsibleSection title="Текст" defaultCollapsed={false}>
+    <CollapsibleSection title="Текст" sectionKey="right-text" defaultCollapsed={false}>
       <div style={{ marginBottom: '12px' }}>
         <label style={labelStyle}>Цвет текста</label>
         <input type="color" value={textColor} onChange={handleColor} style={colorInputStyle} />
@@ -119,7 +119,7 @@ const ShadowSection = ({ offsetX, offsetY, blur, color, onUpdate }) => {
   const handleColor = (e) => onUpdate('shadowColor', e.target.value);
 
   return (
-    <CollapsibleSection title="Тень" defaultCollapsed={true}>
+    <CollapsibleSection title="Тень" sectionKey="right-shadow" defaultCollapsed={true}>
       <div style={{ marginBottom: '12px' }}>
         <label style={labelStyle}>Смещение X (px)</label>
         <input type="number" value={offsetX} onChange={handleOffsetX} style={inputStyle} />

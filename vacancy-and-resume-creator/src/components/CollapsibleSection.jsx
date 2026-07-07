@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { usePanelState } from '@/contexts';
 
-const CollapsibleSection = ({ title, defaultCollapsed = false, children }) => {
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+const CollapsibleSection = ({ title, sectionKey, defaultCollapsed = false, children }) => {
+  const { collapsed, toggle } = usePanelState(sectionKey, defaultCollapsed);
+
   return (
-    <div style={{ marginBottom: '20px', borderBottom: '1px solid #e0e0e0', paddingBottom: '12px' }}>
+    <div style={{ marginBottom: '20px', paddingBottom: '12px' }}>
       <div
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggle}
         style={{
           display: 'flex',
           alignItems: 'center',

@@ -7,7 +7,7 @@ function LeftPanel({ objects, selectedId, onSelect, addObject }) {
 
   return (
     <div style={panelStyle}>
-      <CollapsibleSection title="Шаблоны" defaultCollapsed={false}>
+      <CollapsibleSection title="Шаблоны" sectionKey="left-templates" defaultCollapsed={false}>
         <button
           onClick={handleAddDefaultBlock}
           style={templateButtonStyle}
@@ -17,7 +17,7 @@ function LeftPanel({ objects, selectedId, onSelect, addObject }) {
         {/* Здесь позже добавятся другие шаблоны (вакансия/резюме) */}
       </CollapsibleSection>
 
-      <CollapsibleSection title="Объекты" defaultCollapsed={false}>
+      <CollapsibleSection title="Объекты" sectionKey="left-objects" defaultCollapsed={false}>
         {objects.length === 0 && (
           <div style={{ color: '#999', fontSize: '14px' }}>Нет объектов</div>
         )}
