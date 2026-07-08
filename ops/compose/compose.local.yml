@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  web-dev:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ../../:/app
+    ports:
+      - "5173:5173"
+    command: npm run dev --workspace=apps/web -- --host 0.0.0.0
+    environment:
+      - NODE_ENV=development
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: creator_admin
+      POSTGRES_PASSWORD: secure_dev_password
+      POSTGRES_DB: creator_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_local:/var/lib/postgresql/data
+
+volumes:
+  pgdata_local:

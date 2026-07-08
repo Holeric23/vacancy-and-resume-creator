@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  web-prod:
+    build:
+      context: ../../
+      dockerfile: ops/docker/web.Dockerfile
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: creator_admin
+      POSTGRES_PASSWORD: secure_dev_password
+      POSTGRES_DB: creator_db
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  pgdata_prod:

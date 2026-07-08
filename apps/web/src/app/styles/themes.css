@@ -1,0 +1,56 @@
+/* Светлая тема по умолчанию */
+:root,
+html[data-theme="light"] {
+  /* Интерфейс (Chrome) */
+  --color-bg-app: #f3f4f6;
+  --color-bg-panel: #ffffff;
+  --color-bg-active: #e5e7eb;
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #9ca3af;
+
+  /* Акценты */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+  --color-accent-light: rgba(139, 92, 246, 0.1);
+  
+  /* Контекстные цвета */
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+
+  /* Холст печатной области */
+  --color-bg-canvas-backdrop: #e5e7eb;
+  --color-bg-document-page: #ffffff;
+}
+
+/* Темная тема */
+html[data-theme="dark"] {
+  /* Интерфейс (Chrome) */
+  --color-bg-app: #111827;
+  --color-bg-panel: #1f2937;
+  --color-bg-active: #374151;
+  --color-border: #374151;
+  --color-border-hover: #4b5563;
+  
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #6b7280;
+
+  /* Акценты */
+  --color-accent: #a78bfa;
+  --color-accent-hover: #c084fc;
+  --color-accent-light: rgba(167, 139, 250, 0.15);
+  
+  /* Контекстные цвета */
+  --color-success: #34d399;
+  --color-danger: #f87171;
+  --color-danger-hover: #ef4444;
+
+  /* Холст печатной области (остается контрастным фоном вокруг белого листа) */
+  --color-bg-canvas-backdrop: #0f172a;
+  --color-bg-document-page: #ffffff; /* Сама страница документа А4 ВСЕГДА белая, так как она готовится к печати */
+}
